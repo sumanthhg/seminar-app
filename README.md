@@ -1,0 +1,2 @@
+# seminar-app
+seminar application
