@@ -8,7 +8,8 @@ import Grid from '@material-ui/core/Grid';
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
 import firebase from '../Firebase'
 import Dashboard from './Dashboard';
-
+import { connect } from 'react-redux';
+import { oAuth2 } from '../actions/oauth2'
 const uiConfig = {
     signInFlow: "popup",
     signInOptions: [
@@ -30,13 +31,10 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const App = () => {
-    const [isSignedIn, signIn] = useState(false);
+const App = (props) => {
+
     useEffect(() => {
-        firebase.auth().onAuthStateChanged(user => {
-            signIn(!!user)
-            console.log("user", user)
-        })
+        props.oAuth2(firebase);
     }, []);
 
     const classes = useStyles();
@@ -48,13 +46,13 @@ const App = () => {
                     <Typography variant="h6" className={classes.title}>
                         Seminar
                     </Typography>
-                    {   isSignedIn ? <Button onClick={() => firebase.auth().signOut()} color="inherit">Logout</Button> : '' }
+                    {props.user ? <Button onClick={() => firebase.auth().signOut()} color="inherit">Logout</Button> : ''}
                 </Toolbar>
             </AppBar>
             <Grid container>
                 <Grid item xs={12}>
                     {
-                        isSignedIn ? <Dashboard user={firebase.auth().currentUser} /> :
+                        props.user ? <Dashboard user={props.user} /> :
                             <StyledFirebaseAuth
                                 uiConfig={uiConfig}
                                 firebaseAuth={firebase.auth()}
@@ -65,4 +63,8 @@ const App = () => {
         </div>
     );
 };
-export default App;
+
+const mapStateToProps = (state) => {
+    return { user: state.user }
+}
+export default connect(mapStateToProps, { oAuth2 })(App);

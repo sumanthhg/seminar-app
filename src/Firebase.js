@@ -1,8 +1,6 @@
 import firebase from 'firebase';
 import firestore from 'firebase/firestore'
 
-const settings = {timestampsInSnapshots: true};
-
 const config = {
     apiKey: "AIzaSyDLfKedL082TNSpfxGTzuSgJDobwe7RsgM",
     authDomain: "seminar-app-de2bd.firebaseapp.com",
@@ -15,6 +13,6 @@ const config = {
 };
 firebase.initializeApp(config);
 
-firebase.firestore().settings(settings);
+firebase.firestore();
 
 export default firebase;
