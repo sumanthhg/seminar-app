@@ -8,6 +8,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
+import firebase from '../Firebase';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -38,13 +39,19 @@ const useStyles = makeStyles(theme => ({
 
 const Dashboard = (props) => {
     const classes = useStyles();
+    let ref = null;
     const [open, setOpen] = React.useState(false);
     const [userType, setUserType] = React.useState('TEACHER');
     const [values, setValues] = React.useState({
-        name: '',
+        roomName: '',
         description: '',
         roomId: '',
     });
+    useEffect(() => {
+        ref = firebase.firestore().collection('rooms');
+        debugger
+    }, []);
+
     const handleChange = name => event => {
         setValues({ ...values, [name]: event.target.value });
     };
@@ -56,6 +63,27 @@ const Dashboard = (props) => {
     const handleClose = () => {
         setOpen(false);
     };
+    const onSubmit = (e) => {
+        e.preventDefault();
+
+        const { roomName, description, roomId } = values;
+        const { uid, email, displayName } = props.user;
+
+        ref.add({
+            uid,
+            email,
+            roomName,
+            description,
+            roomId
+        }).then((docRef) => {
+            setOpen(false);
+        })
+            .catch((error) => {
+                console.error("Error adding document: ", error);
+            });
+    }
+
+
     return (
         <div className={classes.root}>
             <Grid container >
@@ -80,12 +108,12 @@ const Dashboard = (props) => {
                 <DialogTitle id="alert-dialog-slide-title">{"Create New Room"}</DialogTitle>
                 <DialogContent>
                     {
-                        userType === 'TEACHER' ? <div>
+                        userType === 'TEACHER' ? <form onSubmit={onSubmit}>
                             <TextField
                                 id="standard-name"
                                 label="Room Name"
                                 className={classes.textField}
-                                value={values.name}
+                                value={values.roomName}
                                 onChange={handleChange('name')}
                                 margin="normal"
                             />
@@ -98,19 +126,21 @@ const Dashboard = (props) => {
                                 onChange={handleChange('description')}
                                 margin="normal"
                             />
-                        </div> :
-                            <TextField
-                                id="standard-roomid"
-                                label="Room Id"
-                                className={classes.textField}
-                                value={values.roomId}
-                                onChange={handleChange('roomId')}
-                                margin="normal"
-                            />
+                        </form> :
+                            <form onSubmit={this.onSubmit}>
+                                <TextField
+                                    id="standard-roomid"
+                                    label="Room Id"
+                                    className={classes.textField}
+                                    value={values.roomId}
+                                    onChange={handleChange('roomId')}
+                                    margin="normal"
+                                />
+                            </form>
                     }
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={onSubmit} color="primary">
                         {userType === 'TEACHER' ? 'Create' : 'Join'}
                     </Button>
                 </DialogActions>

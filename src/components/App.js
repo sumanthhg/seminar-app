@@ -9,7 +9,8 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
 import firebase from '../Firebase'
 import Dashboard from './Dashboard';
 import { connect } from 'react-redux';
-import { oAuth2 } from '../actions/oauth2'
+import { oAuth2 } from '../actions/oauth2';
+
 const uiConfig = {
     signInFlow: "popup",
     signInOptions: [
