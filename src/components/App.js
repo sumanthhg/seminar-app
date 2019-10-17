@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
 const App = (props) => {
 
     useEffect(() => {
-        props.oAuth2(firebase);
+        props.oAuth2();
     }, []);
 
     const classes = useStyles();

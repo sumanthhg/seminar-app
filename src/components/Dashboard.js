@@ -8,7 +8,17 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
-import firebase from '../Firebase';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from '@material-ui/core/Avatar';
+import WorkIcon from '@material-ui/icons/Work';
+import Divider from '@material-ui/core/Divider';
+import Typography from '@material-ui/core/Typography';
+
+import { getRoomsForUser,createRoomsForUser } from '../actions/fetchRooms'
+import { connect } from 'react-redux';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -39,7 +49,7 @@ const useStyles = makeStyles(theme => ({
 
 const Dashboard = (props) => {
     const classes = useStyles();
-    let ref = null;
+    // const ref = firebase.firestore().collection('rooms');
     const [open, setOpen] = React.useState(false);
     const [userType, setUserType] = React.useState('TEACHER');
     const [values, setValues] = React.useState({
@@ -48,8 +58,7 @@ const Dashboard = (props) => {
         roomId: '',
     });
     useEffect(() => {
-        ref = firebase.firestore().collection('rooms');
-        debugger
+        props.getRoomsForUser(props.user.uid);
     }, []);
 
     const handleChange = name => event => {
@@ -65,33 +74,55 @@ const Dashboard = (props) => {
     };
     const onSubmit = (e) => {
         e.preventDefault();
-
         const { roomName, description, roomId } = values;
-        const { uid, email, displayName } = props.user;
-
-        ref.add({
-            uid,
-            email,
-            roomName,
-            description,
-            roomId
-        }).then((docRef) => {
-            setOpen(false);
-        })
-            .catch((error) => {
-                console.error("Error adding document: ", error);
-            });
+        const { uid, email } = props.user;
+        props.createRoomsForUser({ uid, email, roomName, description, roomId });
+        props.getRoomsForUser(uid);
+        setOpen(false);
     }
-
-
     return (
         <div className={classes.root}>
             <Grid container >
                 <Grid item xs={12}>
                     <h1 className={classes.userInfo}>Hi {props.user.displayName}</h1>
                 </Grid>
-                <Grid item xs={12} sm={12} md={6}>
+                <Grid style={{padding:'2rem'}} item xs={12} sm={12} md={6}>
                     <h1 onClick={() => handleClickOpen('TEACHER')} className={classes.room}>Create Room</h1>
+
+                    <List className={classes.root}>
+                        {
+                            props.rooms.map(room =>
+                                (
+                                    <React.Fragment key={room.roomId} >
+                                        <ListItem alignItems="flex-start">
+                                            <ListItemAvatar>
+                                                <Avatar>
+                                                    <WorkIcon />
+                                                </Avatar>
+                                            </ListItemAvatar>
+                                            <ListItemText
+                                                primary={room.email}
+                                                secondary={
+                                                    <React.Fragment>
+                                                        <Typography
+                                                            component="span"
+                                                            variant="body2"
+                                                            className={classes.inline}
+                                                            color="textPrimary"
+                                                        >
+                                                            {room.roomName}
+                                                        </Typography>
+                                                        {`- ${room.description}`}
+                                                    </React.Fragment>
+                                                }
+                                            />
+                                        </ListItem>
+                                        <Divider variant="inset" component="li" />
+                                    </React.Fragment>
+                                )
+                            )
+                        }
+                    </List>
                 </Grid>
                 <Grid item xs={12} sm={12} md={6} >
                     <h1 onClick={() => handleClickOpen('STUDENT')} className={classes.room}>Join Room</h1>
@@ -114,7 +145,7 @@ const Dashboard = (props) => {
                                 label="Room Name"
                                 className={classes.textField}
                                 value={values.roomName}
-                                onChange={handleChange('name')}
+                                onChange={handleChange('roomName')}
                                 margin="normal"
                             />
                             <TextField
@@ -127,7 +158,7 @@ const Dashboard = (props) => {
                                 margin="normal"
                             />
                         </form> :
-                            <form onSubmit={this.onSubmit}>
+                            <form onSubmit={onSubmit}>
                                 <TextField
                                     id="standard-roomid"
                                     label="Room Id"
@@ -148,4 +179,7 @@ const Dashboard = (props) => {
         </div>
     );
 }
-export default Dashboard;
+const mapStateToProps = (state) => {
+    return { rooms: state.rooms }
+}
+export default connect(mapStateToProps, { getRoomsForUser,createRoomsForUser })(Dashboard);
