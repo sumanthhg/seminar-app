@@ -16,8 +16,10 @@ import Avatar from '@material-ui/core/Avatar';
 import WorkIcon from '@material-ui/icons/Work';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
-
-import { getRoomsForUser,createRoomsForUser } from '../actions/fetchRooms'
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import PlayCircleFilledIcon from '@material-ui/icons/PlayCircleFilled';
+import { getRoomsForUser, createRoomsForUser } from '../actions/fetchRooms'
 import { connect } from 'react-redux';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -76,9 +78,14 @@ const Dashboard = (props) => {
         e.preventDefault();
         const { roomName, description, roomId } = values;
         const { uid, email } = props.user;
-        props.createRoomsForUser({ uid, email, roomName, description, roomId });
+        const startDate = new Date();
+        props.createRoomsForUser({ uid, email, roomName, description, roomId, startDate });
         props.getRoomsForUser(uid);
         setOpen(false);
+    }
+    const getFormatedDate = (startDate) => {
+        let date = new Date(startDate.seconds * 1000);
+        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
     }
     return (
         <div className={classes.root}>
@@ -86,7 +93,7 @@ const Dashboard = (props) => {
                 <Grid item xs={12}>
                     <h1 className={classes.userInfo}>Hi {props.user.displayName}</h1>
                 </Grid>
-                <Grid style={{padding:'2rem'}} item xs={12} sm={12} md={6}>
+                <Grid style={{ padding: '2rem' }} item xs={12} sm={12} md={6}>
                     <h1 onClick={() => handleClickOpen('TEACHER')} className={classes.room}>Create Room</h1>
 
                     <List className={classes.root}>
@@ -101,7 +108,7 @@ const Dashboard = (props) => {
                                                 </Avatar>
                                             </ListItemAvatar>
                                             <ListItemText
-                                                primary={room.email}
+                                                primary={room.roomName}
                                                 secondary={
                                                     <React.Fragment>
                                                         <Typography
@@ -110,12 +117,15 @@ const Dashboard = (props) => {
                                                             className={classes.inline}
                                                             color="textPrimary"
                                                         >
-                                                            {room.roomName}
+                                                            {`Created At`}
                                                         </Typography>
-                                                        {`- ${room.description}`}
+                                                        {`- ${getFormatedDate(room.startDate)}`}
                                                     </React.Fragment>
                                                 }
                                             />
+                                            <PlayCircleFilledIcon style={{ width: '2rem' }} />
+                                            <EditIcon style={{ width: '2rem' }} />
+                                            <DeleteIcon style={{ width: '2rem' }} />
                                         </ListItem>
                                         <Divider variant="inset" component="li" />
                                     </React.Fragment>
@@ -182,4 +192,4 @@ const Dashboard = (props) => {
 const mapStateToProps = (state) => {
     return { rooms: state.rooms }
 }
-export default connect(mapStateToProps, { getRoomsForUser,createRoomsForUser })(Dashboard);
+export default connect(mapStateToProps, { getRoomsForUser, createRoomsForUser })(Dashboard);
