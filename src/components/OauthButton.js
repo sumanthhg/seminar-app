@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
 import Button from '@material-ui/core/Button';
 import { oAuth2 } from '../actions/oauth2';
