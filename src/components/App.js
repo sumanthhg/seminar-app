@@ -47,4 +47,4 @@ const App = (props) => {
 const mapStateToProps = (state) => {
     return { user: state.user }
 }
-export default connect(mapStateToProps, { })(App);
+export default connect(mapStateToProps)(App);

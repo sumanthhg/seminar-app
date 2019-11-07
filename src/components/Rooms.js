@@ -28,9 +28,13 @@ const Rooms = (props) => {
         props.getRoomsForUser(props.user.uid);
     }, []);
     const getFormatedDate = (startDate) => {
-        let date = new Date(startDate.seconds * 1000);
-        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
-    }
+        if(startDate instanceof Date){
+            return `${startDate.getFullYear()}/${startDate.getMonth() + 1}/${startDate.getDate()} ${startDate.getHours()}:${startDate.getMinutes()}:${startDate.getSeconds()}`    
+        }else{
+            let date = new Date(startDate.seconds * 1000);
+            return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`    
+        }
+      }
 
     const roomDetails = room => {
 

@@ -3,7 +3,6 @@ export default (state = [], action) => {
         case 'FETCH_ROOMS':
             return action.payload;
         case 'CREATE_ROOM':
-            debugger
             return [...state, action.payload];
         case 'FETCH_ROOM':
             return action.payload;
