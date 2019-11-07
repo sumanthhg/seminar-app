@@ -13,7 +13,9 @@ export const getRoomsForUser = (uid) => dispatch => {
 
 export const createRoomsForUser = (room) => dispatch => {
     const roomsRef = firebase.firestore().collection('rooms');
-    roomsRef.add(room).then((docRef) => { }).catch((error) => {
+    roomsRef.add(room).then((docRef) => { 
+        dispatch({ type: 'CREATE_ROOM', payload: {...room, roomId:docRef.id} });
+    }).catch((error) => {
                 console.error("Error adding document: ", error);
         });
 }
